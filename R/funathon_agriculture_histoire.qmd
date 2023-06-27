@@ -222,12 +222,12 @@ Il y a plusieurs possibilités, ici on va utiliser le package *jsonlite :*
 url = "https://geo.api.gouv.fr/communes?nom=%s&codeDepartement=%s&fields=centre&boost=population&limit=1"
 
 # On utilise la fonction sprintf qui prend une chaine de caractères 'url' et qui va remplacer les %s par les paramètres passées ensuite dans l'ordre. Le premier %s est remplacé par "Toulouse), le second par "31"
-url_completed <- sprintf(url, "Toulouse", "31")
+url_completed <- sprintf(url, "CLERMONT-FERRAND", "63")
 
 # on interroge l'API qui est renvoit un JSON qui est convertie en dataframe grâce à la fonction fromJSON
 resultat <-  fromJSON(url_completed)
 print(resultat)
-print(resultat$centre)
+print(resultat$centre$coordinates[[1]][1])
 ```
 
 #### Trouver les coordonnées des chefs lieux des cantons
@@ -251,9 +251,30 @@ Votre travail consiste à rajouter 2 colonnes, le nom et les coordonnées du cen
 ##################################################################################################################### 
 #####################################################################################################################
 
-surfaces_ra1852_dep <- surfaces_ra1852 %>%
-  mutate(code_dep = ifelse(code<100, paste0("0",as.character(code %/% 10)), as.character(code %/% 10)),
-              url = fromJSON(sprintf(url, canton, code_dep)))
+surfaces_ra1852_dep <- surfaces_ra1852 %>% filter(!is.na(departement)) %>% group_by(code, canton) %>% #filter(canton=="CLERMONT") %>%
+  mutate(code_dep = ifelse(code %in% c(201, 205), "2A", ifelse(code %in% c(202, 203, 204), "2B",
+                    ifelse(code<100, paste0("0",as.character(code %/% 10)), as.character(code %/% 10)) )),
+         code_dep = case_when(
+           canton == "BELFORT" ~ as.character(90),
+           canton == "CHATEAU SALINS" ~ as.character(57),
+           canton == "SARREBOURG" ~ as.character(57),
+           canton == "BRIEY" ~ as.character(54),
+           TRUE ~ code_dep
+         ),
+         canton = case_when(
+           canton == "CLERMONT" & code == 632 ~ "CLERMONT-FERRAND",
+           canton == "LA PALISSE" ~ "LAPALISSE",
+           canton == "PONTS L'EVEQUE" ~ "PONT L'EVEQUE",
+           canton == "ISSINGEAUX" ~ "YSSINGEAUX",
+           canton == "CHALONS SUR MARNE" ~ "Chalons-en-Champagne",
+           canton == "CASTEL SARRASIN" ~ "CASTEL SARRAZIN",
+           canton == "AIX" ~ "Aix-en-Provence",
+           canton == "NAPOLEONVILLE" ~ "PONTIVY",
+           canton == "BRIEY" ~ "VAL DE BRIEY",
+           TRUE ~ canton
+         ),
+         coord_1 = unlist(fromJSON(sprintf(url, gsub(" ","-",canton), code_dep))$centre$coordinates)[1],
+         coord_2 = unlist(fromJSON(sprintf(url, gsub(" ","-",canton), code_dep))$centre$coordinates)[2])
 
 ```
 
