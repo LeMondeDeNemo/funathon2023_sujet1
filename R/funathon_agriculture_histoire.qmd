@@ -290,56 +290,6 @@ surfaces_ra1852_dep <- surfaces_ra1852 %>% filter(!is.na(departement)) %>% group
 
 
 
-#### Vérifier les coordonnées des chefs lieux des cantons
-
-Dans le code précédent, nous avons été confrontés à la gestion de NA... Nous vous proposons ici de les identifier et de mettre à jour les coordonnées de ces lieux.   
-
-
-Il se peut que des coordonnées de chefs-lieux ne soient pas trouvés. Identifiez-le et corrigez-les en mettant à jour la colonne centre avec les vecteurs de coordonnées de la ville recherchée.
-
-```{r}
-#| label: correction_coordonnees_jeu_donnees
-#| warning: false
-#| echo: true
-
-
-##################################################################################################################### 
-##################################################################################################################### 
-####################################### A COMPLETER    #####################################################
-##################################################################################################################### 
-#####################################################################################################################
-leaflet(data = surfaces_ra1852_dep[1:20,]) %>% addTiles() %>%
-  addMarkers(~coord_1, ~coord_2, popup = ~as.character(canton), label = ~as.character(canton))
-
-```
-
-
-#### Créer les colonnes latitude et longitude à partir de la colonne centre
-
-Il ne vous reste plus qu'à séparer la colonne centre pour avoir la latitude et la longitude.
-
-```{r}
-#| label: creation_lat_log
-#| warning: false
-#| echo: true
-
-
-##################################################################################################################### 
-##################################################################################################################### 
-####################################### A COMPLETER    #####################################################
-##################################################################################################################### 
-#####################################################################################################################
-
-```
-
-#### Vérification de l'emplacement des chefs-lieu de canton
-
-Pour vérifier le résultat de notre travail, et pour vérifier également la répartition géographique des cantons, nous vous proposons de réaliser une carte avec un point pour chaque canton.   
-Utilisez la méthode que vous préférez.   
-
-Si vous ne savez pas comment faire, vous pouvez utiliser leaflet avec des markers. La librairie leaflet a été chargée dans le chunk de setup. Il ne vous reste plus qu'à créer le code en vous inspirant de l'aide de leaflet : [Aide Leaflet](https://rstudio.github.io/leaflet/markers.html)
-
-
 ```{r}
 #| label: creation_carte_leaflet_marker
 #| warning: false
@@ -351,6 +301,9 @@ Si vous ne savez pas comment faire, vous pouvez utiliser leaflet avec des marker
 ####################################### A COMPLETER    #####################################################
 ##################################################################################################################### 
 #####################################################################################################################
+
+leaflet(data = surfaces_ra1852_dep) %>% addTiles() %>%
+  addMarkers(~coord_1, ~coord_2, popup = ~as.character(canton), label = ~as.character(canton))
 
 ```
 
@@ -389,24 +342,24 @@ Nous vous proposons de jouer avec les Voronoi sur ce site : [Jeu sur les voronoi
 
 
 # pour travailler sur des aspects géographiques dont les voronoi il faut passer du dataframe au géo dataframe
-# surfaces_ra1852_geo <-
-#   st_as_sf(
-#     surfaces_ra1852_final %>% drop_na(c(longitude, latitude)),
-#     coords = c("longitude", "latitude"),
-#     crs = 4326
-#   )
-# 
-# # on charge la projection pour le mettre en Lambert-93
-# surfaces_ra1852_geo <- st_transform(surfaces_ra1852_geo, crs = 2154) 
-# 
-# # On utilise les fonctions de sf
-# voronoi_surfaces_ra1852 <- surfaces_ra1852_geo %>%
-#   st_union() %>% ## permet de passer une simple à un seul objet géométrique avec tous les points
-#   st_voronoi() %>% ## calcul du voronoi
-#   st_collection_extract()  ## extraction en une liste avec les 363 figures géométriques
-# 
-# # Visualisation simple
-# plot(voronoi_surfaces_ra1852)
+surfaces_ra1852_dep <-
+  st_as_sf(
+    surfaces_ra1852_dep %>% drop_na(c(coord_1, coord_2)),
+    coords = c("coord_1", "coord_2"),
+    crs = 4326
+  )
+
+# on charge la projection pour le mettre en Lambert-93
+surfaces_ra1852_geo <- st_transform(surfaces_ra1852_dep, crs = 2154)
+
+# On utilise les fonctions de sf
+voronoi_surfaces_ra1852 <- surfaces_ra1852_geo %>%
+  st_union() %>% ## permet de passer une simple à un seul objet géométrique avec tous les points
+  st_voronoi() %>% ## calcul du voronoi
+  st_collection_extract()  ## extraction en une liste avec les 363 figures géométriques
+
+# Visualisation simple
+plot(voronoi_surfaces_ra1852)
 ```
 
 ### Amélioration du découpage géographique
@@ -420,6 +373,13 @@ Dans le graphique généré dans le précédent chunk, on reconnait la France en
 #| label: amelioration_pavage_voronoi
 #| warning: false
 #| echo: true
+
+
+dep_poly <- read_sf(here("data/dep2021_simplify2.json"), crs=2154)
+
+dep_poly <- dep_poly %>% filter(nchar(dep)==2)
+
+voronoi2 <- dep_poly %>% st_union() %>% st_intersection(.,voronoi_surfaces_ra1852)
 
 
 ```
@@ -446,7 +406,36 @@ A vous de jouer.
 #####################################################################################################################
 
 
-voronoi_surfaces_final <- read.csv2(here("data/correction_dataframe_intermerdiaire/voronoi_surfaces_final.csv"))
+#voronoi_surfaces_final <- read.csv2(here("data/correction_dataframe_intermerdiaire/voronoi_surfaces_final.csv"))
+
+#Modification de la valeur d'Albi pour les Céréales pour checker
+surfaces_ra1852_dep[37,"canton"][[1]]
+surfaces_ra1852_dep[37,"cereales"] <- 100000
+
+
+#Affichage des Céréales
+listing <- surfaces_ra1852_dep$cereales
+maxi <- max(listing)
+colList <- rgb(listing[1]/maxi,0,0)
+for(i in 2:length(listing))
+{
+  cc <- rgb(listing[i]/maxi,0,0)
+  colList <- c(colList,cc)
+}
+plot(voronoi2, col=c(rep(colList,361)))
+
+
+#Affichage des Paturages
+listing <- surfaces_ra1852_dep$paturages
+maxi <- max(listing)
+colList <- rgb(listing[1]/maxi,0,0)
+for(i in 2:length(listing))
+{
+  cc <- rgb(0,listing[i]/maxi,0)
+  colList <- c(colList,cc)
+}
+plot(voronoi2, col=c(rep(colList,361)))
+
 
 ```
 
