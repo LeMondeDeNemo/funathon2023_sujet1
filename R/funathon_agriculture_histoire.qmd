@@ -114,6 +114,15 @@ Vous vérifierez que :
 - cereales + racines_et_legumes_divers + cultures_diverses + prairies_artificielles + jacheres = total_des_terres_labourables      
 - total_des_terres_labourables +  prairies_naturelles + vignes + autres_cultures_arborescentes + paturages + autres_surfaces_ecoumene = superficie_totale     
 
+```{r}
+#| label: surfaces_mon_canton
+#| warning: false
+
+total <- mon_canton %>%
+  filter(name %in% c("cereales","racines_et_legumes_divers","cultures_diverses","prairies_artificielles","jacheres")) %>% 
+  summarise(TOTAL = sum(value)) %>% 
+  print()
+```
 
 ## 2 - Trouver les coordonnées géographiques des chefs-lieux de canton (utilisation d'une API)
 
