@@ -251,7 +251,7 @@ Votre travail consiste à rajouter 2 colonnes, le nom et les coordonnées du cen
 ##################################################################################################################### 
 #####################################################################################################################
 
-surfaces_ra1852_dep <- surfaces_ra1852 %>% filter(!is.na(departement)) %>% group_by(code, canton) %>% #filter(canton=="CLERMONT") %>%
+surfaces_ra1852_dep <- surfaces_ra1852 %>% filter(!is.na(departement)) %>% group_by(code, canton) %>% arrange(., desc(code))%>% #filter(canton%in%c("GRASSE","TOULOUSE")) %>%
   mutate(code_dep = ifelse(code %in% c(201, 205), "2A", ifelse(code %in% c(202, 203, 204), "2B",
                     ifelse(code<100, paste0("0",as.character(code %/% 10)), as.character(code %/% 10)) )),
          code_dep = case_when(
@@ -259,6 +259,12 @@ surfaces_ra1852_dep <- surfaces_ra1852 %>% filter(!is.na(departement)) %>% group
            canton == "CHATEAU SALINS" ~ as.character(57),
            canton == "SARREBOURG" ~ as.character(57),
            canton == "BRIEY" ~ as.character(54),
+           canton == "SAINT DENIS" ~ as.character(93),
+           canton == "SCEAUX" ~ as.character(92),
+           canton == "CORBEIL" ~ as.character(91),
+           canton == "PONTOISE" ~ as.character(95),
+           canton == "ETAMPES" ~ as.character(91),
+           canton == "GRASSE" ~ "06",
            TRUE ~ code_dep
          ),
          canton = case_when(
@@ -267,10 +273,14 @@ surfaces_ra1852_dep <- surfaces_ra1852 %>% filter(!is.na(departement)) %>% group
            canton == "PONTS L'EVEQUE" ~ "PONT L'EVEQUE",
            canton == "ISSINGEAUX" ~ "YSSINGEAUX",
            canton == "CHALONS SUR MARNE" ~ "Chalons-en-Champagne",
-           canton == "CASTEL SARRASIN" ~ "CASTEL SARRAZIN",
+           canton == "CASTEL SARRASIN" ~ "CASTELSARRASIN",
            canton == "AIX" ~ "Aix-en-Provence",
            canton == "NAPOLEONVILLE" ~ "PONTIVY",
            canton == "BRIEY" ~ "VAL DE BRIEY",
+           canton == "SCHLESTADT" ~ "SELESTAT",
+           canton == "CORBEIL" ~ "Corbeil-Essonnes",
+           canton == "NAPOLEON VENDEE" ~ "La Roche-sur-Yon",
+           canton == "REMIRMONT" ~ "Remiremont",
            TRUE ~ canton
          ),
          coord_1 = unlist(fromJSON(sprintf(url, gsub(" ","-",canton), code_dep))$centre$coordinates)[1],
@@ -298,7 +308,8 @@ Il se peut que des coordonnées de chefs-lieux ne soient pas trouvés. Identifie
 ####################################### A COMPLETER    #####################################################
 ##################################################################################################################### 
 #####################################################################################################################
-
+leaflet(data = surfaces_ra1852_dep[1:20,]) %>% addTiles() %>%
+  addMarkers(~coord_1, ~coord_2, popup = ~as.character(canton), label = ~as.character(canton))
 
 ```
 
