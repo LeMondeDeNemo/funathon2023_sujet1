@@ -251,6 +251,9 @@ Votre travail consiste à rajouter 2 colonnes, le nom et les coordonnées du cen
 ##################################################################################################################### 
 #####################################################################################################################
 
+surfaces_ra1852_dep <- surfaces_ra1852 %>%
+  mutate(code_dep = ifelse(code<100, paste0("0",as.character(code %/% 10)), as.character(code %/% 10)),
+              url = fromJSON(sprintf(url, canton, code_dep)))
 
 ```
 
