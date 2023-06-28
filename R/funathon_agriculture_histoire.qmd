@@ -399,6 +399,22 @@ ggplot() +
   scale_fill_gradient(low = "white", high = "red") +
   labs(fill = "Céréales")
 
+
+
+#Exportation au format csv
+
+coords <- st_coordinates(surfaces_ra1852_geo$geometry)
+
+# Ajouter les coordonnées au dataframe et supprimer l'ancienne
+surfaces_ra1852_geo$X <- coords[, 1]
+surfaces_ra1852_geo$Y <- coords[, 2]
+
+surfaces_ra1852_geo$geometry <- NULL
+
+write.csv(surfaces_ra1852_geo, here("surfaces_ra1852_geo.csv"), col.names=TRUE)
+
+
+
 ```
 
 
