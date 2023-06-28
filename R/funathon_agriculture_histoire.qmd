@@ -387,8 +387,12 @@ voronoi2 <- dep_poly %>% st_union() %>% st_intersection(.,voronoi_surfaces_ra185
 voronoi2_sf <- st_sf(voronoi2)
 voronoi2_attributed <- st_join(voronoi2_sf, voronoi_surfaces_ra1852_attributed)
 
-# Visualisation simple
-plot(voronoi2_attributed)
+# Définir la fonction de palette de couleurs
+palette <- colorRampPalette(c("white", "red"))
+# Générer la palette de couleurs
+colors <- palette(100)  # Ici, 100 est le nombre de couleurs à générer
+# Tracer les données
+plot(voronoi2_attributed, col = colors)
 
 ```
 
@@ -416,7 +420,7 @@ A vous de jouer.
 
 #voronoi_surfaces_final <- read.csv2(here("data/correction_dataframe_intermerdiaire/voronoi_surfaces_final.csv"))
 
-#Modification de la valeur d'Albi pour les Céréales pour checker
+"""#Modification de la valeur d'Albi pour les Céréales pour checker
 surfaces_ra1852_dep[37,"canton"][[1]]
 valInitiale <- surfaces_ra1852_dep[37,"cereales"]
 surfaces_ra1852_dep[37,"cereales"] <- 10000000
@@ -431,7 +435,7 @@ for(i in 2:length(listing))
   cc <- rgb(listing[i]/maxi,0,0)
   colList <- c(colList,cc)
 }
-plot(voronoi2, col=c(rep(colList,361)))
+plot(voronoi2_attributed, col=c(rep(colList,361)))
 
 
 #Affichage des Paturages
@@ -443,7 +447,7 @@ for(i in 2:length(listing))
   cc <- rgb(0,listing[i]/maxi,0)
   colList <- c(colList,cc)
 }
-plot(voronoi2, col=c(rep(colList,361)))
+plot(voronoi2_attributed, col=c(rep(colList,361)))"""
 
 
 ```
