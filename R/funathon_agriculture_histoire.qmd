@@ -414,7 +414,7 @@ surfaces_ra1852_geo2$X <- coords[, 1]
 surfaces_ra1852_geo2$Y <- coords[, 2]
 surfaces_ra1852_geo2$geometry <- NULL
 
-wite.csv(surfaces_ra1852_geo2, here("surfaces_ra1852_geo.csv"), col.names=TRUE)
+write.csv(surfaces_ra1852_geo2, here("surfaces_ra1852_geo.csv"), col.names=TRUE)
 
 
 
