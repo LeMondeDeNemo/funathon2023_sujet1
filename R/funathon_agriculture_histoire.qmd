@@ -65,6 +65,7 @@ library(tmap)
 library(tmaptools)
 library(mapsf)
 library(geojsonsf)
+library(ggplot2)
 
 ```
 
@@ -392,7 +393,11 @@ palette <- colorRampPalette(c("white", "red"))
 # Générer la palette de couleurs
 colors <- palette(100)  # Ici, 100 est le nombre de couleurs à générer
 # Tracer les données
-plot(voronoi2_attributed, col = colors)
+
+ggplot() +
+  geom_sf(data = voronoi2_attributed, aes(fill = voronoi2_attributed$cereales)) +
+  scale_fill_gradient(low = "white", high = "red") +
+  labs(fill = "Céréales")
 
 ```
 
@@ -416,38 +421,6 @@ A vous de jouer.
 ####################################### A COMPLETER    #####################################################
 ##################################################################################################################### 
 #####################################################################################################################
-
-
-#voronoi_surfaces_final <- read.csv2(here("data/correction_dataframe_intermerdiaire/voronoi_surfaces_final.csv"))
-
-"""#Modification de la valeur d'Albi pour les Céréales pour checker
-surfaces_ra1852_dep[37,"canton"][[1]]
-valInitiale <- surfaces_ra1852_dep[37,"cereales"]
-surfaces_ra1852_dep[37,"cereales"] <- 10000000
-
-
-#Affichage des Céréales
-listing <- surfaces_ra1852_dep$cereales
-maxi <- max(listing)
-colList <- rgb(listing[1]/maxi,0,0)
-for(i in 2:length(listing))
-{
-  cc <- rgb(listing[i]/maxi,0,0)
-  colList <- c(colList,cc)
-}
-plot(voronoi2_attributed, col=c(rep(colList,361)))
-
-
-#Affichage des Paturages
-listing <- surfaces_ra1852_dep$paturages
-maxi <- max(listing)
-colList <- rgb(listing[1]/maxi,0,0)
-for(i in 2:length(listing))
-{
-  cc <- rgb(0,listing[i]/maxi,0)
-  colList <- c(colList,cc)
-}
-plot(voronoi2_attributed, col=c(rep(colList,361)))"""
 
 
 ```
