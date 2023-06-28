@@ -358,6 +358,9 @@ voronoi_surfaces_ra1852 <- surfaces_ra1852_geo %>%
   st_voronoi() %>% ## calcul du voronoi
   st_collection_extract()  ## extraction en une liste avec les 363 figures géométriques
 
+voronoi_surfaces_ra1852_sf <- st_sf(voronoi_surfaces_ra1852)
+voronoi_surfaces_ra1852_attributed <- st_join(voronoi_surfaces_ra1852_sf, surfaces_ra1852_geo)
+
 # Visualisation simple
 plot(voronoi_surfaces_ra1852)
 ```
@@ -410,7 +413,8 @@ A vous de jouer.
 
 #Modification de la valeur d'Albi pour les Céréales pour checker
 surfaces_ra1852_dep[37,"canton"][[1]]
-surfaces_ra1852_dep[37,"cereales"] <- 100000
+valInitiale <- surfaces_ra1852_dep[37,"cereales"]
+surfaces_ra1852_dep[37,"cereales"] <- 10000000
 
 
 #Affichage des Céréales
