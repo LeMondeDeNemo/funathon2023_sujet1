@@ -362,7 +362,7 @@ voronoi_surfaces_ra1852_sf <- st_sf(voronoi_surfaces_ra1852)
 voronoi_surfaces_ra1852_attributed <- st_join(voronoi_surfaces_ra1852_sf, surfaces_ra1852_geo)
 
 # Visualisation simple
-plot(voronoi_surfaces_ra1852)
+plot(voronoi_surfaces_ra1852_attributed)
 ```
 
 ### Amélioration du découpage géographique
@@ -382,8 +382,13 @@ dep_poly <- read_sf(here("data/dep2021_simplify2.json"), crs=2154)
 
 dep_poly <- dep_poly %>% filter(nchar(dep)==2)
 
-voronoi2 <- dep_poly %>% st_union() %>% st_intersection(.,voronoi_surfaces_ra1852)
+voronoi2 <- dep_poly %>% st_union() %>% st_intersection(.,voronoi_surfaces_ra1852_attributed)
 
+voronoi2_sf <- st_sf(voronoi2)
+voronoi2_attributed <- st_join(voronoi2_sf, voronoi_surfaces_ra1852_attributed)
+
+# Visualisation simple
+plot(voronoi2_attributed)
 
 ```
 
